@@ -430,7 +430,7 @@ selectButtonTextActive: {
   },
   deleteButton: {
     position: 'absolute',
-    bottom: 24,
+    bottom: 90,
     left: 24,
     backgroundColor: '#ef4444',
     flexDirection: 'row',
