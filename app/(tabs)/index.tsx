@@ -2,6 +2,10 @@ import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, ImageBackground } from 'react-native';
 import { useRouter } from 'expo-router';
 
+export const unstable_settings = {
+  headerShown: false,
+};
+
 const backgroundImage = require('../../assets/images/pic.webp');
 
 export default function HomeScreen() {
@@ -11,11 +15,10 @@ export default function HomeScreen() {
     <ImageBackground
       source={backgroundImage}
       style={styles.background}
-     blurRadius={3}
+      blurRadius={3}
       resizeMode="cover"
     >
       <View style={styles.overlay} />
-
       <View style={styles.container}>
         <Text style={styles.title}>📷 My Photo App</Text>
         <Text style={styles.subtitle}>Capture, Caption, Organize.</Text>
@@ -49,6 +52,8 @@ export default function HomeScreen() {
     </ImageBackground>
   );
 }
+
+// ...styles unchanged
 
 const styles = StyleSheet.create({
   background: {
@@ -108,4 +113,10 @@ const styles = StyleSheet.create({
     textShadowOffset: { width: 0, height: 1 },
     textShadowRadius: 3,
   },
+
+  safeArea: {
+  flex: 1,
+  backgroundColor: '#fefefe',
+},
+
 });

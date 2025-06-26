@@ -1,8 +1,19 @@
 import { useLocalSearchParams, useRouter } from 'expo-router';
-import { View, TextInput, Image, Button, Alert, StyleSheet, Text } from 'react-native';
+import {
+  SafeAreaView,
+  View,
+  TextInput,
+  Image,
+  Text,
+  TouchableOpacity,
+  ScrollView,
+  Alert,
+  StyleSheet,
+} from 'react-native';
 import { useEffect, useState } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as FileSystem from 'expo-file-system';
+import * as ImageManipulator from 'expo-image-manipulator';
 
 type Photo = {
   id: string;
@@ -18,6 +29,7 @@ export default function PhotoDetails() {
   const [photo, setPhoto] = useState<Photo | null>(null);
   const [caption, setCaption] = useState('');
   const [rotation, setRotation] = useState(0);
+  const [isRotated, setIsRotated] = useState(false);
 
   useEffect(() => {
     (async () => {
@@ -43,11 +55,11 @@ export default function PhotoDetails() {
 
       await AsyncStorage.setItem('photos', JSON.stringify(updatedPhotos));
       Alert.alert('Saved', 'Caption updated.', [
-  {
-    text: 'OK',
-    onPress: () => router.push('/gallery'), // redirect after OK
-  },
-]);
+        {
+          text: 'OK',
+          onPress: () => router.push('/gallery'),
+        },
+      ]);
     } catch (err) {
       console.error('Failed to save caption:', err);
     }
@@ -87,6 +99,34 @@ export default function PhotoDetails() {
     }
   };
 
+  const saveRotatedPhoto = async () => {
+    if (!photo) return;
+
+    try {
+      const manipulated = await ImageManipulator.manipulateAsync(
+        photo.uri,
+        [{ rotate: rotation }],
+        { compress: 1, format: ImageManipulator.SaveFormat.PNG }
+      );
+
+      const stored = await AsyncStorage.getItem('photos');
+      const photos: Photo[] = stored ? JSON.parse(stored) : [];
+
+      const updatedPhotos = photos.map(p =>
+        p.id === photo.id ? { ...p, uri: manipulated.uri } : p
+      );
+
+      await AsyncStorage.setItem('photos', JSON.stringify(updatedPhotos));
+      setPhoto({ ...photo, uri: manipulated.uri });
+      setIsRotated(false);
+      setRotation(0);
+
+      Alert.alert('Saved', 'Rotated photo saved successfully.');
+    } catch (err) {
+      console.error('Failed to save rotated photo:', err);
+    }
+  };
+
   if (!photo) {
     return (
       <View style={styles.center}>
@@ -96,7 +136,8 @@ export default function PhotoDetails() {
   }
 
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.safeArea}>
+    <ScrollView contentContainerStyle={styles.container}>
       <Image
         source={{ uri: photo.uri }}
         style={[styles.image, { transform: [{ rotate: `${rotation}deg` }] }]}
@@ -107,50 +148,110 @@ export default function PhotoDetails() {
         value={caption}
         onChangeText={setCaption}
         style={styles.input}
+        placeholderTextColor="#999"
       />
-      <View style={styles.buttons}>
-        <View style={styles.buttonWrapper}>
-          <Button title="Save Caption" onPress={saveCaption} />
-        </View>
-        <View style={styles.buttonWrapper}>
-          <Button title="Rotate" onPress={() => setRotation(r => r + 90)} />
-        </View>
-        <View style={styles.buttonWrapper}>
-          <Button
-            title={photo.favorite ? 'Unfavorite ❤️' : 'Add to Favorites 🤍'}
-            onPress={toggleFavorite}
-          />
-        </View>
-        <View style={styles.buttonWrapper}>
-          <Button title="Delete Photo" color="red" onPress={deletePhoto} />
-        </View>
-        <View style={styles.buttonWrapper}>
-          <Button title="← Back to Gallery" onPress={() => router.back()} />
-        </View>
-      </View>
-    </View>
+      <TouchableOpacity style={styles.button} onPress={saveCaption}>
+        <Text style={styles.buttonText}>💾 Save Caption</Text>
+      </TouchableOpacity>
+
+      <TouchableOpacity
+        style={styles.button}
+        onPress={() => {
+          setRotation(r => (r + 90) % 360);
+          setIsRotated(true);
+        }}
+      >
+        <Text style={styles.buttonText}>🔄 Rotate</Text>
+      </TouchableOpacity>
+
+      {isRotated && (
+        <TouchableOpacity style={styles.button} onPress={saveRotatedPhoto}>
+          <Text style={styles.buttonText}>✅ Save Rotated Photo</Text>
+        </TouchableOpacity>
+      )}
+
+      <TouchableOpacity style={styles.button} onPress={toggleFavorite}>
+        <Text style={styles.buttonText}>
+          {photo.favorite ? '❤️ Unfavorite' : '🤍 Add to Favorites'}
+        </Text>
+      </TouchableOpacity>
+
+      <TouchableOpacity style={[styles.button, styles.deleteButton]} onPress={deletePhoto}>
+        <Text style={styles.buttonText}>🗑️ Delete Photo</Text>
+      </TouchableOpacity>
+
+      <TouchableOpacity style={styles.backButton} onPress={() => router.back()}>
+        <Text style={styles.backButtonText}>← Back to Gallery</Text>
+      </TouchableOpacity>
+    </ScrollView>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, padding: 16 },
-  image: { width: '100%', height: 300, borderRadius: 10 },
+  container: {
+    padding: 20,
+    paddingBottom: 40,
+    backgroundColor: '#fefefe',
+    alignItems: 'center',
+  },
+  image: {
+    width: '100%',
+    height: 320,
+    borderRadius: 15,
+    marginBottom: 20,
+    shadowColor: '#000',
+    shadowOpacity: 0.2,
+    shadowOffset: { width: 0, height: 4 },
+    shadowRadius: 6,
+    elevation: 5,
+    backgroundColor: '#eee',
+  },
   input: {
-    borderWidth: 1,
+    width: '100%',
+    padding: 12,
+    borderRadius: 10,
     borderColor: '#ccc',
-    borderRadius: 6,
+    borderWidth: 1,
+    marginBottom: 16,
+    fontSize: 16,
+    backgroundColor: '#fff',
+    color: '#333',
+  },
+  button: {
+    width: '100%',
+    backgroundColor: '#444',
+    padding: 14,
+    borderRadius: 12,
+    alignItems: 'center',
+    marginVertical: 6,
+    elevation: 2,
+  },
+  buttonText: {
+    color: '#fff',
+    fontWeight: '600',
+    fontSize: 16,
+  },
+  deleteButton: {
+    backgroundColor: '#b00020',
+  },
+  backButton: {
+    marginTop: 20,
     padding: 10,
-    marginVertical: 12,
   },
-  buttons: {
-    // No gap here because React Native doesn't support gap
-  },
-  buttonWrapper: {
-    marginBottom: 10,
+  backButtonText: {
+    color: '#333',
+    fontSize: 16,
+    textDecorationLine: 'underline',
   },
   center: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
   },
+  safeArea: {
+  flex: 1,
+  backgroundColor: '#fefefe', // Same background as your content
+},
+
 });

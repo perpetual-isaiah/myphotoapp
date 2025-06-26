@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import {
+  SafeAreaView,
   View,
   Text,
   Image,
@@ -131,7 +132,9 @@ export default function GalleryScreen() {
     }
   };
 
+  
   return (
+    <SafeAreaView style={styles.safeArea}>
     <View style={styles.container}>
       <View style={styles.searchRow}>
         <TextInput
@@ -173,6 +176,8 @@ export default function GalleryScreen() {
           </Text>
         </TouchableOpacity>
       </View>
+      
+
 
       <ScrollView contentContainerStyle={{ paddingBottom: 100 }}>
         {Object.entries(filteredSections).length === 0 ? (
@@ -244,7 +249,7 @@ export default function GalleryScreen() {
           ))
         )}
       </ScrollView>
-
+     
       {/* Floating Add Photo Button */}
       {!selectionMode && (
         <TouchableOpacity
@@ -269,6 +274,8 @@ export default function GalleryScreen() {
         </TouchableOpacity>
       )}
     </View>
+     </SafeAreaView>
+
   );
 }
 
@@ -453,6 +460,11 @@ selectButtonTextActive: {
   paddingVertical: 3,
   borderRadius: 12,
   zIndex: 10,
+},
+
+safeArea: {
+  flex: 1,
+  backgroundColor: '#fefefe',
 },
 
 });

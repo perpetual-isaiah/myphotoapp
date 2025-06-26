@@ -1,5 +1,6 @@
 import React, { useRef, useState, useEffect } from 'react';
 import {
+   SafeAreaView,
   View,
   StyleSheet,
   Alert,
@@ -88,6 +89,7 @@ export default function CameraScreen() {
   }
 
   return (
+    <SafeAreaView style={styles.safeArea}>
     <View style={styles.container}>
       <Animated.View
         pointerEvents="none"
@@ -120,6 +122,7 @@ export default function CameraScreen() {
         </>
       )}
     </View>
+    </SafeAreaView>
   );
 }
 
@@ -142,7 +145,7 @@ const styles = StyleSheet.create({
   },
   previewButtons: {
     position: 'absolute',
-    bottom: 40,
+    bottom: 90,
     left: 0,
     right: 0,
     flexDirection: 'row',
@@ -161,7 +164,7 @@ const styles = StyleSheet.create({
   },
   snapContainer: {
     position: 'absolute',
-    bottom: 50,
+    bottom: 90,
     alignSelf: 'center',
   },
   snapButton: {
@@ -180,4 +183,9 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     borderRadius: 25,
   },
+  safeArea: {
+  flex: 1,
+  backgroundColor: '#fefefe',
+},
+
 });

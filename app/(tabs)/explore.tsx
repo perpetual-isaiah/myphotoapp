@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import {
-  View, Text, StyleSheet, FlatList, Image, TouchableOpacity, TextInput
+   SafeAreaView, View, Text, StyleSheet, FlatList, Image, TouchableOpacity, TextInput
 } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useRouter } from 'expo-router';
@@ -41,6 +41,7 @@ export default function ExploreTab() {
   );
 
   return (
+<SafeAreaView style={styles.safeArea}>
     <View style={styles.container}>
       <Text style={styles.title}>❤️ Favorite Photos</Text>
 
@@ -73,6 +74,7 @@ export default function ExploreTab() {
         />
       )}
     </View>
+    </SafeAreaView>
   );
 }
 
@@ -99,4 +101,9 @@ const styles = StyleSheet.create({
     marginTop: 32,
     fontSize: 16,
   },
+  safeArea: {
+  flex: 1,
+  backgroundColor: '#fefefe',
+},
+
 });
