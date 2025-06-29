@@ -43,7 +43,7 @@ export default function ExploreTab() {
   return (
 <SafeAreaView style={styles.safeArea}>
     <View style={styles.container}>
-      <Text style={styles.title}>❤️ Favorite Photos</Text>
+      <Text style={styles.title}>❤️ My Favorites </Text>
 
       <TextInput
         placeholder="Search favorites by caption or date..."

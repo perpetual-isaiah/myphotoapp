@@ -1,6 +1,6 @@
 import React, { useRef, useState, useEffect } from 'react';
 import {
-   SafeAreaView,
+  SafeAreaView,
   View,
   StyleSheet,
   Alert,
@@ -14,12 +14,14 @@ import type { CameraView as CameraViewType } from 'expo-camera';
 import * as FileSystem from 'expo-file-system';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import uuid from 'react-native-uuid';
+import { Ionicons } from '@expo/vector-icons';
 
 export default function CameraScreen() {
   const [permission, requestPermission] = useCameraPermissions();
   const [photoUri, setPhotoUri] = useState<string | null>(null);
   const cameraRef = useRef<CameraViewType | null>(null);
   const [flashAnim] = useState(new Animated.Value(0));
+  const [facing, setFacing] = useState<'front' | 'back'>('back');
 
   useEffect(() => {
     if (!permission?.granted) requestPermission();
@@ -90,43 +92,62 @@ export default function CameraScreen() {
 
   return (
     <SafeAreaView style={styles.safeArea}>
-    <View style={styles.container}>
-      <Animated.View
-        pointerEvents="none"
-        style={[styles.flashOverlay, { opacity: flashAnim }]}
-      />
-      {photoUri ? (
-        <>
-          <Image source={{ uri: photoUri }} style={styles.preview} resizeMode="cover" />
-          <View style={styles.previewButtons}>
-            <TouchableOpacity onPress={savePhoto} style={styles.actionButton}>
-              <Text style={styles.actionText}>💾 Save</Text>
-            </TouchableOpacity>
-            <TouchableOpacity onPress={retakePhoto} style={styles.actionButton}>
-              <Text style={styles.actionText}>🔁 Retake</Text>
-            </TouchableOpacity>
-          </View>
-        </>
-      ) : (
-        <>
-          {React.createElement(CameraView as any, {
-            ref: cameraRef,
-            style: styles.camera,
-            facing: 'back',
-          })}
-          <View style={styles.snapContainer}>
-            <TouchableOpacity onPress={takePhoto} style={styles.snapButton}>
-              <View style={styles.innerSnap} />
-            </TouchableOpacity>
-          </View>
-        </>
-      )}
-    </View>
+      <View style={styles.container}>
+        <Animated.View
+          pointerEvents="none"
+          style={[styles.flashOverlay, { opacity: flashAnim }]}
+        />
+
+        {photoUri ? (
+          <>
+            <Image source={{ uri: photoUri }} style={styles.preview} resizeMode="cover" />
+            <View style={styles.previewButtons}>
+              <TouchableOpacity onPress={savePhoto} style={styles.actionButton}>
+                <Ionicons name="save-outline" size={28} color="#000" />
+              </TouchableOpacity>
+              <TouchableOpacity onPress={retakePhoto} style={styles.actionButton}>
+                <Ionicons name="refresh" size={28} color="#000" />
+              </TouchableOpacity>
+            </View>
+          </>
+        ) : (
+          <>
+            {/* Flip Camera Button */}
+            <View style={styles.topControls}>
+              <TouchableOpacity
+                onPress={() => setFacing(f => (f === 'back' ? 'front' : 'back'))}
+                style={styles.flipButton}
+              >
+                
+                <Ionicons name="camera-reverse" size={28} color="#000" />
+              </TouchableOpacity>
+            </View>
+
+            {/* Camera Preview */}
+            {React.createElement(CameraView as any, {
+              ref: cameraRef,
+              style: styles.camera,
+              facing: facing,
+            })}
+
+            {/* Snap Button */}
+            <View style={styles.snapContainer}>
+              <TouchableOpacity onPress={takePhoto} style={styles.snapButton}>
+                <View style={styles.innerSnap} />
+              </TouchableOpacity>
+            </View>
+          </>
+        )}
+      </View>
     </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
+  safeArea: {
+    flex: 1,
+    backgroundColor: '#fefefe',
+  },
   container: {
     flex: 1,
     backgroundColor: 'black',
@@ -183,9 +204,26 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     borderRadius: 25,
   },
-  safeArea: {
-  flex: 1,
-  backgroundColor: '#fefefe',
+  topControls: {
+    position: 'absolute',
+    top: 50,
+    right: 20,
+    zIndex: 100,
+  },
+  flipButton: {
+  backgroundColor: '#ffffff80',
+  padding: 10,
+  borderRadius: 25,
+  justifyContent: 'center',
+  alignItems: 'center',
+},
+iconButton: {
+  backgroundColor: '#ffffffcc',
+  padding: 14,
+  borderRadius: 30,
+  justifyContent: 'center',
+  alignItems: 'center',
+  marginHorizontal: 10,
 },
 
 });

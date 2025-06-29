@@ -32,6 +32,9 @@ export default function TabLayout() {
             case 'explore':
               iconName = focused ? 'heart' : 'heart-outline';
               break;
+              case 'albums': // 👈 Add this case (ensure route name matches your file)
+    iconName = focused ? 'albums' : 'albums-outline';
+    break;
             default:
               iconName = 'ellipse-outline';
           }

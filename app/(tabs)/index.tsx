@@ -6,7 +6,7 @@ export const unstable_settings = {
   headerShown: false,
 };
 
-const backgroundImage = require('../../assets/images/pic.webp');
+const backgroundImage = require('../../assets/images/pic2.webp');
 
 export default function HomeScreen() {
   const router = useRouter();
@@ -15,12 +15,12 @@ export default function HomeScreen() {
     <ImageBackground
       source={backgroundImage}
       style={styles.background}
-      blurRadius={3}
+      blurRadius={2}
       resizeMode="cover"
     >
       <View style={styles.overlay} />
       <View style={styles.container}>
-        <Text style={styles.title}>📷 My Photo App</Text>
+        <Text style={styles.title}>VibeCam</Text>
         <Text style={styles.subtitle}>Capture, Caption, Organize.</Text>
 
         <View style={styles.buttonGroup}>
@@ -45,7 +45,7 @@ export default function HomeScreen() {
             activeOpacity={0.75}
             onPress={() => router.push('/(tabs)/explore')}
           >
-            <Text style={styles.buttonText}>Explore Tab</Text>
+            <Text style={styles.buttonText}>View Favorites</Text>
           </TouchableOpacity>
         </View>
       </View>
